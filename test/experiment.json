@@ -1,0 +1,12 @@
+{
+	"author": "bmiroglo",
+	"experiment_slug": "pref-flip-search-vol-pbm-1518393",
+	"start": "2019-01-29",
+	"end": "2019-02-26",
+	"enrollment_end": "2019-02-06",
+	"target_percent": "0.3%",
+	"channels": "release",
+	"versions": "64",
+	"reprocess_etl": false
+
+}

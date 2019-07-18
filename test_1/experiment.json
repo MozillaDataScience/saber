@@ -1,0 +1,12 @@
+{
+	"author": "bmiroglo",
+	"experiment_slug": "pref-flip-study-search-inprivate-browsing-new-tab-impact-study-66-1532374",
+	"start": "2019-03-18",
+	"end": "2019-04-29",
+	"enrollment_end": "2019-03-28",
+	"target_percent": "0.9%",
+	"channels": "release",
+	"versions": "66",
+	"reprocess_etl": false
+
+}
