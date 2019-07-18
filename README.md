@@ -10,3 +10,6 @@ To test locally:
 * Run `mkdir data && Rscript -e "rmarkdown::render('test.Rmd')" && open test.html` 
 
 This is a prototype and more work needs to be done. I don't expect these steps to work without some kinks to start on a different machine.
+
+
+The two successfully rendered test cases can be viewed [here](https://metrics.mozilla.com/~bmiroglio/saber_test/) (LDAP credentials required).
