@@ -1,0 +1,21 @@
+{
+	"author": "bmiroglio",
+	"dir": "new-tab-spoc-exp",
+	"experiment_slug": "pref-activity-stream-pkt-new-tab-release69-layout-holdbac-release-69-bug-1577291",
+	"report_title": "Newtab SPOC Experiment",
+	"start_date": "2019-09-03",
+	"end_date": "2019-09-17",
+	"enrollment_end_date": "2019-10-29",
+	"treatment_branch_name": "3-col-7-row-octr",
+	"control_branch_name": "basic",
+	"target_percent": "6%",
+	"channels": "release",
+	"versions": "69",
+	"reprocess_etl": false,
+	"metrics": [
+		"sap",
+		"tagged_sap",
+		"ad_clicks",
+		"organic"
+	]
+}
