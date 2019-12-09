@@ -32,15 +32,13 @@ render_pct_change_table <- function(metrics, s=summary) {
 
 plot_pct_changes <- function(metrics, s=summary) {
   if (metrics!="*") s <- s[Metric %in% metrics]
-  l <- min(quantile(s$lower, .01), 0)
-  u <- max(quantile(s$upper, .99), 0)
   s$color <- factor(s$color)
   ggplot(s, aes(x=Metric, y=`Percent Change`, colour=color)) +
     geom_errorbar(aes(ymin=lower, 
                       ymax=upper), 
                   width = .1) +
     geom_point(size=2) +
-    coord_flip(ylim=c(l, u)) + theme_bw() + theme(legend.position="bottom", 
+    coord_flip(ylim=c(-.1, .1)) + theme_bw() + theme(legend.position="bottom", 
                                                   legend.title=element_blank()) +
     xlab("") + ylab("% Change") + 
     labs(title='Percent Change Estimates',
@@ -80,7 +78,7 @@ create_summary <- function(of, alpha=.01) {
   # construct human readable ci and col   or code based on whether or not
   # the result is significant
   of$ci <- paste("(", round(of$lower, 4)*100, "%, ", round(of$upper, 4)*100, "%)", sep="")
-  of$color <- ifelse(of$upper < 0, 2, as.numeric(of$lower + of$upper > of$lower & (of$lower - .001) < 0))
+  of$color <- ifelse(of$upper < 0, 2, as.numeric(of$lower + of$upper > of$lower & (of$lower - .00001) < 0))
   of <- na.omit(of) # for now, ad_clicks missing from gcp
   setnames(of, old=c('ci'), new = c(paste(as.character((1-alpha)*100), "% Confidence Interval", sep='')))
   of$abs_change <- abs(of$`Percent Change`)
@@ -97,7 +95,7 @@ create_summary_dist <- function(b=boot, r=result, alpha=.01) {
   # construct human readable ci and color code based on whether or not
   # the result is significant
   of$ci <- paste("(", round(of$lower, 4)*100, "%, ", round(of$upper, 4)*100, "%)", sep="")
-  of$color <- ifelse(of$upper < 0, 2, as.numeric(of$lower + of$upper > of$lower & (of$lower - .001) < 0))
+  of$color <- ifelse(of$upper < 0, 2, as.numeric(of$lower + of$upper > of$lower & (of$lower - .0001) < 0))
   of <- na.omit(of) # for now, ad_clicks missing from gcp
   setnames(of, old=c('ci'), new = c(paste(as.character((1-alpha)*100), "% Confidence Interval", sep='')))
   of$abs_change <- abs(of$`Percent Change`)

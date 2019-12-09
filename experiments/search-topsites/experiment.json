@@ -1,0 +1,20 @@
+{
+	"author": "bmiroglio",
+	"dir": "search-topsites",
+	"experiment_slug": "addon-activity-stream-search-topsites-release-69-1576277",
+	"report_title": "Topsites Search Volume",
+	"start_date": "2019-09-17",
+	"end_date": "2019-11-19",
+	"enrollment_end_date": "2019-10-01",
+	"treatment_branch_name": "treatment",
+	"control_branch_name": "control",
+	"target_percent": "0.9%",
+	"channels": "release",
+	"versions": "69",
+	"metrics": [
+		"sap",
+		"tagged_sap",
+		"ad_clicks",
+		"organic"
+	]
+}
