@@ -2,15 +2,40 @@
 
 This is an MVP of the SABER framework.
 
-To test locally:
+To run locally
 
-* Ensure you have GCP credentials somewhere locally and specify the path [here in `etl.R`](https://github.com/benmiroglio/saber/blob/master/test_1/etl.R#L14).
-* `cd` into one of the test directories and open `experiments.json`. Set `reprocess_etl` to `true`.
-* Make sure you have R/[RMarkdown](https://bookdown.org/yihui/rmarkdown/installation.html) installed (I recommend [Rstudio](https://www.rstudio.com/products/rstudio/download/) as well).
-* Run `mkdir data && Rscript -e "rmarkdown::render('test.Rmd')" && open test.html` 
-  + Running ETL, bootstrapping, and rendering the report should take about 5 minutes! Upon completion, the locally-rendered report will open in your browser.
+* Ensure you have GCP credentials and point to them in the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+* Create a new experiment folder under the `experiments` directory, i.e `experiments/my_new_experiment`
+* Create a specification JSON file like the one below
 
-This is a prototype and more work needs to be done. I don't expect these steps to work without some kinks to start on a different machine.
+```json
+{
+	"author": "bmiroglio",
+	"dir": "new-tab-spoc-exp",
+	"experiment_slug": "pref-activity-stream-pkt-new-tab-release69-layout-holdbac-release-69-bug-1577291",
+	"report_title": "Newtab SPOC Experiment",
+	"start_date": "2019-09-03",
+	"end_date": "2019-09-17",
+	"enrollment_end_date": "2019-10-29",
+	"treatment_branch_name": "3-col-7-row-octr",
+	"control_branch_name": "basic",
+	"target_percent": "6%",
+	"channels": "release",
+	"versions": "69",
+	"metrics": [
+		"sap",
+		"tagged_sap",
+		"ad_clicks",
+		"organic"
+	]
+}
+```
 
+* Fill in the relevant fields for your study.`dir` is the name of the directory you just created (in this case, "my_new_experiment")
+* From the top level directory, run the following command
 
-The two successfully rendered test cases can be viewed [here](https://metrics.mozilla.com/~bmiroglio/saber_test/) (LDAP credentials required).
+```bash
+$ bash run.sh experiments/my_new_experiment
+```
+
+That's it! This will grab your data, aggregate it, generate bootstrapped statistics, and render the scaffolding for a report. The report should be edited as needed to properly communicate the results. 
