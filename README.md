@@ -5,6 +5,8 @@ This is an MVP of the SABER framework.
 To run locally
 
 * Ensure you have GCP credentials and point to them in the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+* Install the [BigQuery client library for python](https://cloud.google.com/bigquery/docs/reference/libraries#client-libraries-install-python).
+* Install R/[RMarkdown](https://bookdown.org/yihui/rmarkdown/installation.html).
 * Create a new experiment folder under the `experiments` directory, i.e `experiments/my_new_experiment`
 * Create a specification JSON file like the one below
 
