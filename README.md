@@ -13,7 +13,6 @@ To run locally
 ```json
 {
 	"author": "bmiroglio",
-	"dir": "my_new_experiment",
 	"experiment_slug": "my_experiment_slug_bug_xxxxx",
 	"report_title": "My Experiment Title",
 	"start_date": "2019-09-03",
