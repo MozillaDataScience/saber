@@ -1,3 +1,4 @@
+# checks to see if package is installed, if not installs it
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -5,7 +6,23 @@ ipak <- function(pkg){
   p <- sapply(pkg, require, character.only = TRUE)
 }
 
-render_pct_change_table <- function(metrics, s=summary) {
+
+create_summary <- function(of, alpha=.01) {
+  # construct human readable ci and col   or code based on whether or not
+  # the result is significant
+  of$ci <- paste("(", round(of$lower, 4)*100, "%, ", round(of$upper, 4)*100, "%)", sep="")
+  of$color <- ifelse(of$upper < 0, 2, as.numeric(of$lower + of$upper > of$lower & (of$lower - .00001) < 0))
+  of <- na.omit(of) # for now, ad_clicks missing from gcp
+  setnames(of, old=c('ci'), new = c(paste(as.character((1-alpha)*100), "% Confidence Interval", sep='')))
+  of$abs_change <- abs(of$`Percent Change`)
+  of
+}
+
+
+# results are in a tidy format: column names is represented as follows:
+# c("metric", "branch", "a range of percentiles", "exp")
+
+render_pct_change_table <- function(s=summary) {
   if (metrics!="*") s <- s[Metric %in% metrics]
   # get (1-alpha) CI from bootstrap
   # and merge with experiment result
@@ -74,16 +91,7 @@ plot_pct_changes_decile <- function(s) {
   
 }
 
-create_summary <- function(of, alpha=.01) {
-  # construct human readable ci and col   or code based on whether or not
-  # the result is significant
-  of$ci <- paste("(", round(of$lower, 4)*100, "%, ", round(of$upper, 4)*100, "%)", sep="")
-  of$color <- ifelse(of$upper < 0, 2, as.numeric(of$lower + of$upper > of$lower & (of$lower - .00001) < 0))
-  of <- na.omit(of) # for now, ad_clicks missing from gcp
-  setnames(of, old=c('ci'), new = c(paste(as.character((1-alpha)*100), "% Confidence Interval", sep='')))
-  of$abs_change <- abs(of$`Percent Change`)
-  of
-}
+
 
 create_summary_dist <- function(b=boot, r=result, alpha=.01) {
   of <- merge(

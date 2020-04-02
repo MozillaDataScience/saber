@@ -29,6 +29,56 @@ report <- rjson::fromJSON(file="../report.json")
 experiment <- rjson::fromJSON(file="../experiment.json")
 ```
 
+Status: <*final*>
+
+## Supporting Assets
+- [Experimenter](https://experimenter.services.mozilla.com/experiments/separate-search-default-in-private-browsing/)
+
+# Motivation
+The Search team wants to understand how many users would choose to enable a separate search engine for private browsing mode and if this would impact our search volume.
+
+# Design
+<p align="center"><img src=../design.png width=400px alt='experiment_mockup'></p>
+<!-- ![](images/design.png) -->
+
+
+# {.tabset}
+
+## Executive Summary 
+
+### Objective
+The goal of the experiment is to see if there was any impact to search volume with enable the ability to choose a separate search engine for private browsing mode. Also, we would like to understand what percentage of users would enable a separate search engine for private browsing.
+
+### Discussion
+From this study, here are some of our general conclusions:
+
+- We saw that there was no reliable impact on the search volume.
+
+- There were virtually no switches to a separate private browser engine on the treatment branches.
+
+## Methods
+### Terminology
+
+For this study, we used the following terms for our analysis:
+
+Our study has three branches, `control`, `treatment-no-banner`, `treatment-banner`:
+- `control` refers to our cohort of users who did not receive any changes to their Firefox experience.
+- `treatment-no-banner` refers to our cohort of users who had the option in Preferences to enable a separate search engine for private browsing mode but there was no intervention to let them know.
+- `treatment-banner` refers to our cohort of users who received a doorhanger to inform them that they can enable a separate search engine for private browsing mode.
+
+### Data Assets
+This experiment launched on `r experiment$start_date`, and targeted 0.2% of Firefox Release Users (smaller sample to mitigate any potential revenue impact) on version 71 to 73. These users were randomly sampled and assigned one of the three experimental conditions: `control`, `treatment-no-banner`, or `treatment-banner`.
+
+We evaluated six measures of interactions in this study on a `per user` basis:
+
+1. *Organic* search weekly volume count
+
+2. *sap* search weekly volume count
+
+3. Number of enabled separate search engines for private browsing mode
+
+## Tables
+
 ```{r echo=FALSE}
 metrics <- list()
 for (table_name in experiment$metrics) {
@@ -38,63 +88,7 @@ for (table_name in experiment$metrics) {
 }
 
 df <- read_csv(paste0('../data/', experiment["last_date_full_data"],'_', report['experiment_slug'], '.csv'))
-branches <- pull(unique(df['branch']))
 ```
-
-Status: <*final*>
-
-## Supporting Assets
-- [Experimenter](`r paste0('https://experimenter.services.mozilla.com/experiments/', experiment['experimenter_name'])`)
-
-# Motivation
-This is an experiment report for the ``r spec$experiment_slug`` study.
-
-__DS to complete__
-
-# Design
-<p align="center"><img src=../design.png width=400px alt='experiment_mockup'></p>
-
-
-# {.tabset}
-
-## Executive Summary 
-
-### Objective
-
-__DS to complete__
-
-### TL;DR 
-
-__DS to complete__
-
-## Methods
-### Terminology
-
-For this study, we used the following terms for our analysis:
-
-__DS to complete__
-
-### Data Assets
-This experiment launched on `r experiment$start_date`, and targeted 0.2% of Firefox Release Users (smaller sample to mitigate any potential revenue impact) on version 71 to 73. These users were randomly sampled and assigned one of the `r length(branches)` experimental conditions: `r branches`.
-
-We evaluated `r length(metrics)` measures of interactions in this study on a `per user` basis:
-
-```{r}
-metric_descriptions
-```
-1. *Organic* search weekly volume count
-
-2. *sap* search weekly volume count
-
-3. Number of enabled separate search engines for private browsing mode
-
-### Discussion
-
-__DS to complete__
-
-## Tables
-
-
 
 ```{r}
 create_summary_list <- function(df, alpha_level=.01) {
