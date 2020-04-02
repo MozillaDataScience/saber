@@ -1,0 +1,38 @@
+{
+  "experiment_name": "separate_search_default_pbm",
+  "start_date": "2019-12-17",
+  "last_date_full_data": "2020-02-18",
+  "num_dates_enrollment": 28,
+  "analysis_start_days": 0,
+  "analysis_length_days": 32,
+  "n_resamples": 1000,
+  "dataset_id": "teon",
+  "metrics": {
+    "search_clients_daily": {
+      "sap": {
+        "description": "Number of Search Access Point (sap) searches",
+        "select_expr": "SUM(COALESCE(sap, 0))"
+      },
+      "organic": {
+        "description": "Number of Organic searches",
+        "select_expr": "SUM(COALESCE(organic, 0))"
+      },
+      "separate_search_engine": {
+        "description": "Separate Search Engine Enabled",
+        "select_expr": [
+              "ANY_VALUE(CASE WHEN default_search_engine = default_private_search_engine",
+              "or default_private_search_engine is null THEN 0",
+              "ELSE 1 END)"
+        ]
+      },
+      "subsession_hours_sum": {
+        "description": "Total Session hours",
+        "select_expr": "ANY_VALUE(subsession_hours_sum)"
+      },
+      "active_hours_sum": {
+        "description": "Total Active Session hours",
+        "select_expr": "ANY_VALUE(active_hours_sum)"
+      }
+    }
+  }
+}

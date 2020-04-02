@@ -1,0 +1,8 @@
+{
+    "title": "Pref-Flip Experiment: Separate Search default in Private Browsing",
+    "publish_date": "2020-03-25",
+    "author": "Teon L Brooks",
+    "email": "teon@mozilla.com",
+    "experiment_slug": "pref-separate-search-default-in-private-browsing-release-71-73-bug-1603606",
+    "file": "analysis/index.html"
+}
