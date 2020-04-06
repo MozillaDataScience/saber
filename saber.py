@@ -2,12 +2,12 @@ import os
 import os.path as op
 from optparse import OptionParser
 import etl
+import shutil
+import subprocess
 
 
 version = 'v2.0'
 description = 'Search A/B Experiment Report'
-
-
 
 
 def run():
@@ -23,11 +23,20 @@ def run():
 
 
     options, args = parser.parse_args()
-
     exp_path = options.folder_path
 
-    for dirname in ['sql', 'data', 'analysis']:
-        dir_path = op.join(folder_path, dirname)
-        if not op.exists(dir_path):
-            os.mkdir(dir_path)
+    # run the ETL
     etl.run_etl(exp_path)
+
+    # copy over the template report
+    rmd_file = op.join(exp_path, 'index.Rmd')
+    html_file = op.join(exp_path, 'index.Rmd')
+    shutil.copyfile('template.Rmd', rmd_file)
+
+    # knit the preliminary report
+    subprocess.run(["R", "-e",
+                    (f"rmarkdown::render('{rmd_file}',"
+                     f"output_file='{op.join(exp_path, index.html)}')")
+    ])
+
+)

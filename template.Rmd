@@ -75,7 +75,7 @@ For this study, we used the following terms for our analysis:
 __DS to complete__
 
 ### Data Assets
-This experiment launched on `r experiment$start_date`, and targeted 0.2% of Firefox Release Users (smaller sample to mitigate any potential revenue impact) on version 71 to 73. These users were randomly sampled and assigned one of the `r length(branches)` experimental conditions: `r branches`.
+This experiment launched on `r experiment$start_date`, and targeted `r experiment$target_percent` of Firefox Users on version `r experiment$version`. These users were randomly sampled and assigned one of the `r length(branches)` experimental conditions: `r branches`.
 
 We evaluated `r length(metrics)` measures of interactions in this study on a `per user` basis:
 

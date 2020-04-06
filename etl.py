@@ -1,5 +1,6 @@
 import numpy as np
 import os.path as op
+import os
 import json
 from datetime import date
 from collections import OrderedDict
@@ -12,12 +13,22 @@ from mozanalysis.experiment import Experiment, TimeLimits
 from mozanalysis.bq import BigQueryContext
 
 
+def _build_directory(folder_path):
+    for dirname in ['sql', 'data', 'analysis']:
+        dir_path = op.abspath(op.join(folder_path, dirname))
+        if not op.exists(dir_path):
+            os.mkdir(dir_path)
+
+    return(folder_path)
+
+
 def run_etl(exp_path):
     exp_path = op.abspath(exp_path)
+    _build_directory(exp_path)
     experiment = json.load(open(op.join(exp_path, "experiment.json")))
     report = json.load(open(op.join(exp_path, "report.json")))
 
-    EXP_NAME = experiment["experiment_name"]
+    EXP_NAME = experiment["experimenter_name"]
     DATE = date.today()
     FILENAME_ANALYSIS_DATA = op.join(exp_path, 'data',
                                     f'{experiment["last_date_full_data"]}_'
@@ -39,14 +50,23 @@ def run_etl(exp_path):
         num_dates_enrollment=experiment["num_dates_enrollment"]
     )
 
-    metric_list = [
-        Metric(name=key, data_source=getattr(desktop, data_source),
-            select_expr=value['select_expr']
-                if isinstance(value['select_expr'], str)
-                else ' '.join(value['select_expr']))
-        for data_source, data_source_metrics in experiment['metrics'].items()
-        for key, value in data_source_metrics.items()
-    ]
+    metric_list = list()
+    for metric in experiment['metrics']:
+        if isinstance(metric, str):
+            try:
+                metric_list.append(getattr(desktop, metric))
+            except AttributeError:
+                print(f'{metric} is not a pre-defined Metric. Will skip')
+        if isinstance(metric, dict):
+            for data_source, data_source_metrics in metric.items():
+                for key, value in data_source_metrics.items():
+                    select_expr = value['select_expr']
+                    if isinstance(select_expr, list):
+                        select_expr = ' '.join(select_expr)
+                    metric_list.append(
+                        Metric(name=key, data_source=getattr(desktop, data_source),
+                            select_expr=select_expr)
+                    )
 
     single_window_res = exp.get_single_window_data(
         bq_context=bq_context,
@@ -62,9 +82,10 @@ def run_etl(exp_path):
         analysis_start_days=experiment['analysis_start_days'],
         analysis_length_dates=experiment['analysis_length_days'],
         num_dates_enrollment=experiment['num_dates_enrollment'])
-    query = exp._build_query(metric_list=metric_list, time_limits=time_limits,
+    query = exp.build_query(metric_list=metric_list, time_limits=time_limits,
                             enrollments_query_type='normandy')
     open(FILENAME_SQL, 'w').write(query)
+    print(query)
 
     metric_names = [metric.name for metric in metric_list]
 
@@ -120,3 +141,5 @@ def run_etl(exp_path):
 
     res_metrics = pd.DataFrame(res_metrics)
     res_metrics.to_csv(FILENAME_ANALYSIS_DATA, index=False)
+
+    return res_metrics
