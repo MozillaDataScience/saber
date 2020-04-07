@@ -25,8 +25,8 @@ ipak(c("plotly", "tidyverse", "DT", "htmltools"))
 ```
 
 ```{r}
-report <- rjson::fromJSON(file="../report.json")
-experiment <- rjson::fromJSON(file="../experiment.json")
+report <- rjson::fromJSON(file="report.json")
+experiment <- rjson::fromJSON(file="experiment.json")
 ```
 
 ```{r echo=FALSE}
@@ -37,7 +37,7 @@ for (table_name in experiment$metrics) {
   }
 }
 
-df <- read_csv(paste0('../data/', experiment["last_date_full_data"],'_', report['experiment_slug'], '.csv'))
+df <- read_csv(paste0('data/', experiment["last_date_full_data"],'_', report['experiment_slug'], '.csv'))
 branches <- pull(unique(df['branch']))
 ```
 
