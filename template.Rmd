@@ -1,13 +1,12 @@
 ---
-title: '`r rjson::fromJSON(file="../report.json")$title`'
-author: '`r rjson::fromJSON(file="../report.json")$author` <<`r rjson::fromJSON(file="../report.json")$email`>>'
+title: '`r rjson::fromJSON(file="report.json")$title`'
+author: '`r rjson::fromJSON(file="report.json")$author` <<`r rjson::fromJSON(file="report.json")$email`>>'
 Status: '<*final*>'
-date: '`r rjson::fromJSON(file="../report.json")$publish_date`'
+date: '`r rjson::fromJSON(file="report.json")$publish_date`'
 output:
   html_document:
     theme: cosmo
-    toc: true
-    toc_float: true
+    toc: false
 ---
 ```{r global_options, include=FALSE, echo=FALSE, paged.print=TRUE}
 knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='images/',
@@ -17,11 +16,11 @@ knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='images/',
 ```{r setup}
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
-  if (length(new.pkg)) 
+  if (length(new.pkg))
     install.packages(new.pkg, dependencies = TRUE)
   p <- sapply(pkg, require, character.only = TRUE)
 }
-ipak(c("plotly", "tidyverse", "DT", "htmltools"))
+ipak(c("tidyverse", "DT", "htmltools"))
 ```
 
 ```{r}
@@ -30,44 +29,33 @@ experiment <- rjson::fromJSON(file="experiment.json")
 ```
 
 ```{r echo=FALSE}
-metrics <- list()
-for (table_name in experiment$metrics) {
-  for (metric in names(table_name)) {
-    metrics[metric] <- table_name[[metric]]
-  }
-}
-
 df <- read_csv(paste0('data/', experiment["last_date_full_data"],'_', report['experiment_slug'], '.csv'))
-branches <- pull(unique(df['branch']))
+branches <- df %>% pull(branch) %>% unique()
+metrics  <- df %>% pull(metric) %>% unique()
 ```
 
-Status: <*final*>
-
-## Supporting Assets
-- [Experimenter](`r paste0('https://experimenter.services.mozilla.com/experiments/', experiment['experimenter_name'])`)
+Status: <*automated draft*>
 
 # Motivation
-This is an experiment report for the ``r spec$experiment_slug`` study.
+This is an experiment report for the ``r experiment$experiment_slug`` study.
 
 __DS to complete__
 
-# Design
-<p align="center"><img src=../design.png width=400px alt='experiment_mockup'></p>
+# Executive Summary
+
+__DS to complete__
 
 
 # {.tabset}
 
-## Executive Summary 
+## Design
+<p align="center"><img src=design.png width=400px alt='experiment_mockup'></p>
 
-### Objective
-
-__DS to complete__
-
-### TL;DR 
-
-__DS to complete__
 
 ## Methods
+### Supporting Assets
+- [Experimenter](`r paste0('https://experimenter.services.mozilla.com/experiments/', experiment['experimenter_name'])`)
+
 ### Terminology
 
 For this study, we used the following terms for our analysis:
@@ -79,21 +67,13 @@ This experiment launched on `r experiment$start_date`, and targeted `r experimen
 
 We evaluated `r length(metrics)` measures of interactions in this study on a `per user` basis:
 
-```{r}
-metric_descriptions
+```{r include=FALSE}
+knitr::kable(unique(df['metric']), col.names='Metrics')
 ```
-1. *Organic* search weekly volume count
-
-2. *sap* search weekly volume count
-
-3. Number of enabled separate search engines for private browsing mode
 
 ### Discussion
 
 __DS to complete__
-
-## Tables
-
 
 
 ```{r}
@@ -102,12 +82,20 @@ create_summary_list <- function(df, alpha_level=.01) {
   ci_cols <- sapply(ci, toString)
 
   rel_uplift <- df %>% filter(analysis == 'rel_uplift')
-  rel_uplift['sig'] = sign(rel_uplift[ci_cols[1]] * rel_uplift[ci_cols[2]])
-  branches <- pull(unique(rel_uplift['branch']))
-  
+
   # figure out why there are nans in the results
   rel_uplift[is.na(rel_uplift)] = 0
   
+  rel_uplift['sig'] = sign(rel_uplift[ci_cols[1]] * rel_uplift[ci_cols[2]])
+  rel_uplift[rel_uplift['sig'] == 0,]['sig'] = -1
+  rel_uplift$sig <- factor(rel_uplift$sig)
+
+  rel_uplift <- rel_uplift %>% mutate(lower_ci = pull(rel_uplift[ci_cols[1]]),
+                                      upper_ci = pull(rel_uplift[ci_cols[2]]))
+  branches <- pull(rel_uplift['branch']) %>% unique()
+
+
+
   # create ci column
   ci_bound <- as.character((1 - alpha_level) * 100)
   rel_uplift$ci <- paste0(ci_bound, "% CI [ ",
@@ -115,42 +103,92 @@ create_summary_list <- function(df, alpha_level=.01) {
                           "%, ",
                           round(pull(rel_uplift, ci_cols[2]), 4)*100, "% ]")
   rel_uplift$expected_mean <- paste0(round(pull(rel_uplift, exp), 4)*100, "%")
-  
-  rel_uplift <- rel_uplift %>%  select(metric, expected_mean, ci, sig, branch)
-  
-  metric_descriptions = c()
-  for (metric in rel_uplift$metric) {
-    metric_descriptions = c(metric_descriptions, metrics[[metric]])
-  }
-  # give a more detailed metric description
-  rel_uplift <- rel_uplift %>% mutate(metric = metric_descriptions)
-  
+  # rel_uplift$color <- ifelse(rel_uplift[ci_cols[2]] < 0, 2,
+  #                            as.numeric(rel_uplift[ci_cols[1]] + rel_uplift[ci_cols[2]] > rel_uplift[ci_cols[1]] &
+  #                                       (rel_uplift[ci_cols[1]] - .00001) < 0))
+  # 
+  # # rel_uplift <- rel_uplift %>%  select(metric, expected_mean, ci, sig, branch,
+  # #                                      exp, lower_ci, upper_ci)
+
   summary_list <- split(rel_uplift, f=rel_uplift$branch)
-  
+
   return(summary_list)
+}
+summary_list <- create_summary_list(df)
+```
+## Summary Plots
+```{r}
+create_plot <- function(metric_summary) {
+  ggplot(metric_summary, aes(x=metric, y=exp, colour=sig)) +
+    geom_errorbar(aes(ymin=lower_ci,
+                      ymax=upper_ci),
+                  width = .1) +
+    geom_point(size=2) +
+    coord_flip(ylim=c(-.1, .1)) + theme_bw() + theme(legend.position="bottom",
+                                                  legend.title=element_blank()) +
+    xlab("") + ylab("% Change") +
+    labs(title='Percent Change Estimates',
+         subtitle=paste0("(", first(metric_summary$branch), " - Control), with 99% CIs")) +
+    geom_hline(yintercept = 0, linetype=2) + scale_y_continuous(labels = function(x) paste0(x*100, "%")) +
+    # #ff2e2e is red
+    scale_color_manual(values=c("1"='#008000', "-1"='grey'), labels=c('1'="Reliable Change", '-1'="No Reliable Change"))
+
 }
 ```
 
 ```{r}
-create_table <- function(summary)  {   
+lapply(summary_list, create_plot)
+```
+
+## Decile Plots
+```{r}
+plot_pct_changes_decile <- function(metric_summary) {
+
+  metric_summary <- metric_summary %>% pivot_longer(`0.1`:`0.9`, names_to='percentile', values_to='pct_value')
+  metric_summary$percentile <- metric_summary$percentile %>% strtrim(3) %>% as.numeric()
+  
+  branch <- first(metric_summary$branch)
+  ggplot(metric_summary, aes(x=pct_value, y=percentile)) + 
+    geom_point(size=2, alpha=.5) + 
+    facet_wrap(~metric) +
+     theme_bw() + theme(legend.position="bottom", legend.title=element_blank()) +
+    xlab("% Change") + ylab("Decile") +
+    labs(title='Percent Change Estimates by Decile',
+         subtitle=paste0("(", branch, " - Control)")) +
+    geom_vline(xintercept = 0, linetype=2) +
+    scale_x_continuous(labels = scales::percent) + xlim(-.1, .1)
+}
+```
+```{r}
+lapply(summary_list, plot_pct_changes_decile)
+```
+
+## Tables
+```{r}
+create_table <- function(metric_summary)  {
   # since summary is split by branch, this could be any element from the column
-  branch_name <- first(summary$branch)
-  datatable(summary,
+  branch_name <- first(metric_summary$branch)
+  metric_summary <- metric_summary %>% select(metric, expected_mean, ci, sig, branch)
+  # generate the table
+  datatable(metric_summary,
+            fillContainer=TRUE,
             colnames= c('Metric of Interest' = 'metric',
-                        'Percentage Change' = 'expected_mean', 
+                        'Percentage Change' = 'expected_mean',
                         'Confidence Interval' = 'ci',
                         'Significance' = 'sig'),
             caption=paste0("Overall Percentage Changes for Each Each Metric\n(`",
                            branch_name, "` - `control`)"),
             options=list(
-                      dom='t',
+                      autoWidth = TRUE,
+                      dom="t",
                       columnDefs=list(
                         list(className='dt-left', targets=2),
                         list(visible=F, targets=c(4,5))
-                      )
-                    )
-) %>%
-  # formatPercentage("expected_mean", 2) %>%
+                        ),
+                      order = list(list(abs(5), 'desc'))
+            ),
+  ) %>%
+  formatPercentage("Metric of Interest", 2) %>%
   formatStyle(
     "Significance",
     color = styleEqual(c(-1, 0, 1), c("grey", "blue", "blue")),
@@ -158,29 +196,10 @@ create_table <- function(summary)  {
   ) %>%
   formatStyle(c(1),
               fontWeight = "bold"
-              ) %>% return()
+  ) %>% return()
 }
 ```
 
-```{r, fig.height=4.5, fig.width=5}
-summary_list <- create_summary_list(df)
+```{r}
 tagList(lapply(summary_list, create_table))
 ```
-
-```{r}
-totals <- read_csv('../data/spbm_totals.csv')
-datatable(totals, colnames=c('Branch Name'='branch',
-                             'Number of Users per Branch'='n_users',
-                             'Total SAP searches'='total_sap',
-                             'Total Organic searches'='total_organic',
-                             'Total Separate PBM switches'='total_switch'
-                             ),
-          options=list(dom='t'),
-          caption='Overall Totals per Branch')
-```
-
-
-```{r}
-# (ggplot(df %>% filter(metric == "sap")) + geom_boxplot(mapping=aes(x=branch, y=exp))) %>% ggplotly()
-```
-
