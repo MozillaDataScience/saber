@@ -20,7 +20,7 @@ ipak <- function(pkg){
     install.packages(new.pkg, dependencies = TRUE)
   p <- sapply(pkg, require, character.only = TRUE)
 }
-ipak(c("tidyverse", "DT", "htmltools", "plotly"))
+ipak(c("tidyverse", "DT", "htmltools"))
 ```
 
 ```{r}
@@ -37,7 +37,7 @@ metrics  <- df %>% pull(metric) %>% unique()
 Status: <*automated draft*>
 
 # Motivation
-This is an experiment report for the ``r experiment$experiment_slug`` study.
+This is an experiment report for the ``r report$experiment_slug`` study.
 
 __DS to complete__
 
@@ -85,7 +85,7 @@ create_summary_list <- function(df, alpha_level=.01) {
 
   # figure out why there are nans in the results
   rel_uplift[is.na(rel_uplift)] = 0
-  
+
   rel_uplift['sig'] = sign(rel_uplift[ci_cols[1]] * rel_uplift[ci_cols[2]])
   rel_uplift[rel_uplift['sig'] == 0,]['sig'] = -1
   rel_uplift$sig <- factor(rel_uplift$sig)
@@ -106,7 +106,7 @@ create_summary_list <- function(df, alpha_level=.01) {
   # rel_uplift$color <- ifelse(rel_uplift[ci_cols[2]] < 0, 2,
   #                            as.numeric(rel_uplift[ci_cols[1]] + rel_uplift[ci_cols[2]] > rel_uplift[ci_cols[1]] &
   #                                       (rel_uplift[ci_cols[1]] - .00001) < 0))
-  # 
+  #
   # # rel_uplift <- rel_uplift %>%  select(metric, expected_mean, ci, sig, branch,
   # #                                      exp, lower_ci, upper_ci)
 
@@ -119,7 +119,7 @@ summary_list <- create_summary_list(df)
 ## Summary Plots
 ```{r}
 create_plot <- function(metric_summary) {
-  plot <- ggplot(metric_summary, aes(x=metric, y=exp, colour=sig)) +
+  ggplot(metric_summary, aes(x=metric, y=exp, colour=sig)) +
     geom_errorbar(aes(ymin=lower_ci,
                       ymax=upper_ci),
                   width = .1) +
@@ -132,15 +132,12 @@ create_plot <- function(metric_summary) {
     geom_hline(yintercept = 0, linetype=2) + scale_y_continuous(labels = function(x) paste0(x*100, "%")) +
     # #ff2e2e is red
     scale_color_manual(values=c("1"='#008000', "-1"='grey'), labels=c('1'="Reliable Change", '-1'="No Reliable Change"))
-  
-  fig <- ggplotly(plot)
-  return(fig)
 
 }
 ```
 
 ```{r}
-tagList(lapply(summary_list, create_plot))
+lapply(summary_list, create_plot)
 ```
 
 ## Decile Plots
@@ -149,10 +146,10 @@ plot_pct_changes_decile <- function(metric_summary) {
 
   metric_summary <- metric_summary %>% pivot_longer(`0.1`:`0.9`, names_to='percentile', values_to='pct_value')
   metric_summary$percentile <- metric_summary$percentile %>% strtrim(3) %>% as.numeric()
-  
+
   branch <- first(metric_summary$branch)
-  plot <- ggplot(metric_summary, aes(x=pct_value, y=percentile)) + 
-    geom_point(size=2, alpha=.5) + 
+  ggplot(metric_summary, aes(x=pct_value, y=percentile)) +
+    geom_point(size=2, alpha=.5) +
     facet_wrap(~metric) +
      theme_bw() + theme(legend.position="bottom", legend.title=element_blank()) +
     xlab("% Change") + ylab("Decile") +
@@ -160,13 +157,10 @@ plot_pct_changes_decile <- function(metric_summary) {
          subtitle=paste0("(", branch, " - Control)")) +
     geom_vline(xintercept = 0, linetype=2) +
     scale_x_continuous(labels = scales::percent) + xlim(-.1, .1)
-    
-  fig <- ggplotly(plot)
-  return(fig)
 }
 ```
 ```{r}
-tagList(lapply(summary_list, plot_pct_changes_decile))
+lapply(summary_list, plot_pct_changes_decile)
 ```
 
 ## Tables

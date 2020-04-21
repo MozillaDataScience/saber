@@ -22,34 +22,35 @@ def _build_directory(folder_path):
     return(folder_path)
 
 
-def run_etl(exp_path):
-    exp_path = op.abspath(exp_path)
-    _build_directory(exp_path)
+def _load_jsons(exp_path):
     experiment = json.load(open(op.join(exp_path, "experiment.json")))
     report = json.load(open(op.join(exp_path, "report.json")))
 
-    EXP_NAME = experiment["experimenter_name"]
-    DATE = date.today()
-    FILENAME_ANALYSIS_DATA = op.join(exp_path, 'data',
-                                    f'{experiment["last_date_full_data"]}_'
-                                    f'{report["experiment_slug"]}.csv')
-    FILENAME_SQL = op.join(exp_path, 'sql',
-                           f'{experiment["last_date_full_data"]}_'
-                           f'{report["experiment_slug"]}.sql')
+    return experiment, report
 
-    deciles = np.arange(1, 10) * 0.1
-    ci_quantiles = (0.005, 0.025, 0.5, 0.975, 0.995)
-    quantiles = np.unique(np.hstack((deciles, ci_quantiles)))
-    quantiles.sort()
 
-    bq_context = BigQueryContext(dataset_id=experiment["dataset_id"])
+def dry_run_query(exp_path, metric_list):
+    experiment, report = _load_jsons(exp_path)
 
     exp = Experiment(
         experiment_slug=report["experiment_slug"],
         start_date=experiment["start_date"],
         num_dates_enrollment=experiment["num_dates_enrollment"]
     )
+    # create an archive of the sql generating analysis
+    time_limits = TimeLimits.for_single_analysis_window(
+        first_enrollment_date=experiment['start_date'],
+        last_date_full_data=experiment['last_date_full_data'],
+        analysis_start_days=experiment['analysis_start_days'],
+        analysis_length_dates=experiment['analysis_length_days'],
+        num_dates_enrollment=experiment['num_dates_enrollment'])
+    query = exp.build_query(metric_list=metric_list, time_limits=time_limits,
+                            enrollments_query_type='normandy')
 
+    return query
+
+
+def make_metric_list(experiment):
     metric_list = list()
     for metric in experiment['metrics']:
         if isinstance(metric, str):
@@ -68,6 +69,34 @@ def run_etl(exp_path):
                             select_expr=select_expr)
                     )
 
+    return metric_list
+
+
+def run_etl(exp_path, overwrite=False):
+    exp_path = op.abspath(exp_path)
+    _build_directory(exp_path)
+    experiment, report = _load_jsons(exp_path)
+
+    FILENAME_ANALYSIS_DATA = op.join(exp_path, 'data',
+                                    f'{experiment["last_date_full_data"]}_'
+                                    f'{report["experiment_slug"]}.csv')
+
+
+    deciles = np.arange(1, 10) * 0.1
+    ci_quantiles = (0.005, 0.025, 0.5, 0.975, 0.995)
+    quantiles = np.unique(np.hstack((deciles, ci_quantiles)))
+    quantiles.sort()
+
+    bq_context = BigQueryContext(dataset_id=experiment["dataset_id"])
+
+    exp = Experiment(
+        experiment_slug=report["experiment_slug"],
+        start_date=experiment["start_date"],
+        num_dates_enrollment=experiment["num_dates_enrollment"]
+    )
+
+    metric_list = make_metric_list(experiment)
+
     single_window_res = exp.get_single_window_data(
         bq_context=bq_context,
         metric_list=metric_list,
@@ -75,17 +104,16 @@ def run_etl(exp_path):
         analysis_start_days=experiment["analysis_start_days"],
         analysis_length_days=experiment["analysis_length_days"]
     )
-    # create an archive of the sql generating analysis
-    time_limits = TimeLimits.for_single_analysis_window(
-        first_enrollment_date=experiment['start_date'],
-        last_date_full_data=experiment['last_date_full_data'],
-        analysis_start_days=experiment['analysis_start_days'],
-        analysis_length_dates=experiment['analysis_length_days'],
-        num_dates_enrollment=experiment['num_dates_enrollment'])
-    query = exp.build_query(metric_list=metric_list, time_limits=time_limits,
-                            enrollments_query_type='normandy')
-    open(FILENAME_SQL, 'w').write(query)
-    print(query)
+
+    query = dry_run_query(exp_path, metric_list)
+    FILENAME_SQL = op.join(exp_path, 'sql',
+                           f'{experiment["last_date_full_data"]}_'
+                           f'{report["experiment_slug"]}.sql')
+    oserror_msg = "File exists and overwrite was set to False."
+    if not op.exists(FILENAME_SQL) or overwrite:
+        open(FILENAME_SQL, 'w').write(query)
+    else:
+        raise OSError(oserror_msg)
 
     metric_names = [metric.name for metric in metric_list]
 
@@ -140,6 +168,10 @@ def run_etl(exp_path):
         res_metrics.extend(res_metric)
 
     res_metrics = pd.DataFrame(res_metrics)
-    res_metrics.to_csv(FILENAME_ANALYSIS_DATA, index=False)
+    if not op.exists(FILENAME_ANALYSIS_DATA) or overwrite:
+        res_metrics.to_csv(FILENAME_ANALYSIS_DATA, index=False)
+    else:
+        raise OSError(oserror_msg)
+
 
     return res_metrics
