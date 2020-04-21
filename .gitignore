@@ -6,3 +6,5 @@ _files*
 *report.html
 *egg-info*
 *.pyc
+*.sql
+*.png
