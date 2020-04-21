@@ -25,11 +25,10 @@ ipak(c("tidyverse", "DT", "htmltools"))
 
 ```{r}
 report <- rjson::fromJSON(file="report.json")
-experiment <- rjson::fromJSON(file="experiment.json")
 ```
 
 ```{r echo=FALSE}
-df <- read_csv(paste0('data/', experiment["last_date_full_data"],'_', report['experiment_slug'], '.csv'))
+df <- read_csv(paste0('data/', report["last_date_full_data"],'_', report['experiment_slug'], '.csv'))
 branches <- df %>% pull(branch) %>% unique()
 metrics  <- df %>% pull(metric) %>% unique()
 ```
@@ -54,7 +53,7 @@ __DS to complete__
 
 ## Methods
 ### Supporting Assets
-- [Experimenter](`r paste0('https://experimenter.services.mozilla.com/experiments/', experiment['experimenter_name'])`)
+- [Experimenter](`r paste0('https://experimenter.services.mozilla.com/experiments/', report['experimenter_name'])`)
 
 ### Terminology
 
@@ -63,7 +62,7 @@ For this study, we used the following terms for our analysis:
 __DS to complete__
 
 ### Data Assets
-This experiment launched on `r experiment$start_date`, and targeted `r experiment$target_percent` of Firefox Users on version `r experiment$version`. These users were randomly sampled and assigned one of the `r length(branches)` experimental conditions: `r branches`.
+This experiment launched on `r report$start_date`, and targeted `r report$target_percent` of Firefox Users on version `r report$version`. These users were randomly sampled and assigned one of the `r length(branches)` experimental conditions: `r branches`.
 
 We evaluated `r length(metrics)` measures of interactions in this study on a `per user` basis:
 
@@ -87,7 +86,7 @@ create_summary_list <- function(df, alpha_level=.01) {
   rel_uplift[is.na(rel_uplift)] = 0
 
   rel_uplift['sig'] = sign(rel_uplift[ci_cols[1]] * rel_uplift[ci_cols[2]])
-  rel_uplift[rel_uplift['sig'] == 0,]['sig'] = -1
+  rel_uplift <- rel_uplift %>% mutate(sig = if_else(sig == 0, -1, sig))
   rel_uplift$sig <- factor(rel_uplift$sig)
 
   rel_uplift <- rel_uplift %>% mutate(lower_ci = pull(rel_uplift[ci_cols[1]]),
@@ -103,12 +102,6 @@ create_summary_list <- function(df, alpha_level=.01) {
                           "%, ",
                           round(pull(rel_uplift, ci_cols[2]), 4)*100, "% ]")
   rel_uplift$expected_mean <- paste0(round(pull(rel_uplift, exp), 4)*100, "%")
-  # rel_uplift$color <- ifelse(rel_uplift[ci_cols[2]] < 0, 2,
-  #                            as.numeric(rel_uplift[ci_cols[1]] + rel_uplift[ci_cols[2]] > rel_uplift[ci_cols[1]] &
-  #                                       (rel_uplift[ci_cols[1]] - .00001) < 0))
-  #
-  # # rel_uplift <- rel_uplift %>%  select(metric, expected_mean, ci, sig, branch,
-  # #                                      exp, lower_ci, upper_ci)
 
   summary_list <- split(rel_uplift, f=rel_uplift$branch)
 

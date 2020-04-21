@@ -1,12 +1,13 @@
 import os
 import os.path as op
-from argparse import ArgumentParser
-import _etl
 import shutil
 import subprocess
+from argparse import ArgumentParser
+import webbrowser
 
+import _etl
 
-description = 'Search A/B Experiment Report'
+description = 'SABER: Search A/B Experiment Report'
 
 
 def run():
@@ -17,10 +18,13 @@ def run():
                         help='The folder path', default=None)
     parser.add_argument('-f', dest='overwrite', action='store_true',
                         help='Force an overwrite')
+    parser.add_argument('-o', dest='openbrowser', action='store_true',
+                        help='Open report in web browser')
 
     args = parser.parse_args()
     exp_path = args.folder_path
     overwrite = args.overwrite
+    openbrowser = args.openbrowser
     if not args.folder_path:
         raise IndexError('Missing folder argument.')
 
@@ -29,7 +33,7 @@ def run():
     rmd_file = template.format('{}', 'index.Rmd')
     img_file = template.format('{}', 'design.png')
     html_file = template.format(exp_path, 'index.html')
-    saber_dir = op.dirname(op.abspath(__file__))
+    saber_dir = op.abspath(op.join(op.dirname(__file__), '..'))
 
     # check to make sure you're not overwriting
     if op.exists(rmd_file.format(exp_path)) and not overwrite:
@@ -50,4 +54,6 @@ def run():
     subprocess.run(["R", "-e",
                     (f"rmarkdown::render('{rmd_file.format(exp_path)}',"
                      f"output_file='{html_file}')")
-    ])
+                    ])
+    if openbrowser:
+        webbrowser.open_new_tab(('file://' + op.abspath(html_file)))

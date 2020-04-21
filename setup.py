@@ -50,8 +50,10 @@ if __name__ == "__main__":
           packages=find_packages(where='saber'),
           package_dir={'': 'saber'},
           install_requires=[
-              'mozanalysis'
+              'mozanalysis',
+              'jsonschema',
+              'pandas'
           ],
           entry_points={'console_scripts': [
-              'saber = _command_line:run',
+              'saber = utils.command_line:run',
           ]})

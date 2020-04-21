@@ -1,16 +1,18 @@
-import numpy as np
-import os.path as op
-import os
 import json
-from datetime import date
+import os
+import os.path as op
 from collections import OrderedDict
-import pandas as pd
+from datetime import date
 
-from mozanalysis.metrics import Metric
-import mozanalysis.metrics.desktop as desktop
+import numpy as np
+import pandas as pd
 import mozanalysis.frequentist_stats.bootstrap as mafsb
-from mozanalysis.experiment import Experiment, TimeLimits
+import mozanalysis.metrics.desktop as desktop
 from mozanalysis.bq import BigQueryContext
+from mozanalysis.experiment import Experiment, TimeLimits
+from mozanalysis.metrics import Metric
+
+from utils.validate_schema import validate_schema
 
 
 def _build_directory(folder_path):
@@ -22,37 +24,30 @@ def _build_directory(folder_path):
     return(folder_path)
 
 
-def _load_jsons(exp_path):
-    experiment = json.load(open(op.join(exp_path, "experiment.json")))
-    report = json.load(open(op.join(exp_path, "report.json")))
-
-    return experiment, report
-
-
 def dry_run_query(exp_path, metric_list):
-    experiment, report = _load_jsons(exp_path)
+    report = validate_schema(op.join(exp_path, "report.json"))
 
     exp = Experiment(
         experiment_slug=report["experiment_slug"],
-        start_date=experiment["start_date"],
-        num_dates_enrollment=experiment["num_dates_enrollment"]
+        start_date=report["start_date"],
+        num_dates_enrollment=report["num_dates_enrollment"]
     )
     # create an archive of the sql generating analysis
     time_limits = TimeLimits.for_single_analysis_window(
-        first_enrollment_date=experiment['start_date'],
-        last_date_full_data=experiment['last_date_full_data'],
-        analysis_start_days=experiment['analysis_start_days'],
-        analysis_length_dates=experiment['analysis_length_days'],
-        num_dates_enrollment=experiment['num_dates_enrollment'])
+        first_enrollment_date=report['start_date'],
+        last_date_full_data=report['last_date_full_data'],
+        analysis_start_days=report['analysis_start_days'],
+        analysis_length_dates=report['analysis_length_days'],
+        num_dates_enrollment=report['num_dates_enrollment'])
     query = exp.build_query(metric_list=metric_list, time_limits=time_limits,
                             enrollments_query_type='normandy')
 
     return query
 
 
-def make_metric_list(experiment):
+def make_metric_list(report):
     metric_list = list()
-    for metric in experiment['metrics']:
+    for metric in report['metrics']:
         if isinstance(metric, str):
             try:
                 metric_list.append(getattr(desktop, metric))
@@ -75,10 +70,10 @@ def make_metric_list(experiment):
 def run_etl(exp_path, overwrite=False):
     exp_path = op.abspath(exp_path)
     _build_directory(exp_path)
-    experiment, report = _load_jsons(exp_path)
+    report = validate_schema(op.join(exp_path, "report.json"))
 
     FILENAME_ANALYSIS_DATA = op.join(exp_path, 'data',
-                                    f'{experiment["last_date_full_data"]}_'
+                                    f'{report["last_date_full_data"]}_'
                                     f'{report["experiment_slug"]}.csv')
 
 
@@ -87,27 +82,27 @@ def run_etl(exp_path, overwrite=False):
     quantiles = np.unique(np.hstack((deciles, ci_quantiles)))
     quantiles.sort()
 
-    bq_context = BigQueryContext(dataset_id=experiment["dataset_id"])
+    bq_context = BigQueryContext(dataset_id=report["dataset_id"])
 
     exp = Experiment(
         experiment_slug=report["experiment_slug"],
-        start_date=experiment["start_date"],
-        num_dates_enrollment=experiment["num_dates_enrollment"]
+        start_date=report["start_date"],
+        num_dates_enrollment=report["num_dates_enrollment"]
     )
 
-    metric_list = make_metric_list(experiment)
+    metric_list = make_metric_list(report)
 
     single_window_res = exp.get_single_window_data(
         bq_context=bq_context,
         metric_list=metric_list,
-        last_date_full_data=experiment["last_date_full_data"],
-        analysis_start_days=experiment["analysis_start_days"],
-        analysis_length_days=experiment["analysis_length_days"]
+        last_date_full_data=report["last_date_full_data"],
+        analysis_start_days=report["analysis_start_days"],
+        analysis_length_days=report["analysis_length_days"]
     )
 
     query = dry_run_query(exp_path, metric_list)
     FILENAME_SQL = op.join(exp_path, 'sql',
-                           f'{experiment["last_date_full_data"]}_'
+                           f'{report["last_date_full_data"]}_'
                            f'{report["experiment_slug"]}.sql')
     oserror_msg = "File exists and overwrite was set to False."
     if not op.exists(FILENAME_SQL) or overwrite:
@@ -162,7 +157,7 @@ def run_etl(exp_path, overwrite=False):
                 metric, threshold_quantile=0.999,
                 individual_summary_quantiles=list(quantiles),
                 comparative_summary_quantiles=list(quantiles),
-                num_samples = experiment['n_resamples']
+                num_samples = report['n_resamples']
             )
         )
         res_metrics.extend(res_metric)
