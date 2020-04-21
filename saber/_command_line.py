@@ -1,7 +1,7 @@
 import os
 import os.path as op
 from argparse import ArgumentParser
-import etl
+import _etl
 import shutil
 import subprocess
 
@@ -20,6 +20,7 @@ def run():
 
     args = parser.parse_args()
     exp_path = args.folder_path
+    overwrite = args.overwrite
     if not args.folder_path:
         raise IndexError('Missing folder argument.')
 
@@ -31,12 +32,12 @@ def run():
     saber_dir = op.dirname(op.abspath(__file__))
 
     # check to make sure you're not overwriting
-    if op.exists(rmd_file.format(exp_path)) and not args.overwrite:
+    if op.exists(rmd_file.format(exp_path)) and not overwrite:
         raise OSError("File already exists!")
 
     # run the ETL
     print("Proceeding to etl...")
-    # etl.run_etl(exp_path)
+    _etl.run_etl(exp_path, overwrite)
 
     # copy over files
     shutil.copyfile(rmd_file.format(op.join(saber_dir, 'template')),

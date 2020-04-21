@@ -57,17 +57,17 @@ def make_metric_list(experiment):
             try:
                 metric_list.append(getattr(desktop, metric))
             except AttributeError:
-                print(f'{metric} is not a pre-defined Metric. Will skip')
+                print(f'`{metric}` is not a pre-defined Metric. Will skip')
         if isinstance(metric, dict):
             for data_source, data_source_metrics in metric.items():
-                for key, value in data_source_metrics.items():
-                    select_expr = value['select_expr']
+                for key, select_expr in data_source_metrics.items():
                     if isinstance(select_expr, list):
                         select_expr = ' '.join(select_expr)
-                    metric_list.append(
-                        Metric(name=key, data_source=getattr(desktop, data_source),
-                            select_expr=select_expr)
-                    )
+                    new_metric = Metric(name=key,
+                                        data_source=getattr(desktop,
+                                                            data_source),
+                                        select_expr=select_expr)
+                    metric_list.append(new_metric)
 
     return metric_list
 

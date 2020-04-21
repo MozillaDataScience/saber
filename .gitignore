@@ -4,6 +4,5 @@ _files*
 *.csv
 *report.Rmd
 *report.html
-__pycache__/etl.cpython-36.pyc
 *egg-info*
 *.pyc
