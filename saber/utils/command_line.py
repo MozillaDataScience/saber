@@ -22,7 +22,7 @@ def run():
                         help='Open report in web browser')
 
     args = parser.parse_args()
-    exp_path = args.folder_path
+    exp_path = op.abspath(args.folder_path)
     overwrite = args.overwrite
     openbrowser = args.openbrowser
     if not args.folder_path:
@@ -46,7 +46,7 @@ def run():
     # copy over files
     shutil.copyfile(rmd_file.format(op.join(saber_dir, 'template')),
                     rmd_file.format(exp_path))
-    if not op.exists(img_file):
+    if not op.exists(img_file.format(op.join(exp_path, 'template'))):
         shutil.copyfile(img_file.format(op.join(saber_dir, 'template')),
                         img_file.format(exp_path))
 

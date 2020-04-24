@@ -8,3 +8,4 @@ _files*
 *.pyc
 *.sql
 *.png
+*.ipynb_checkpoints*

@@ -45,50 +45,52 @@ def dry_run_query(exp_path, metric_list):
     return query
 
 
-def make_metric_list(report):
-    metric_list = list()
-    for metric in report['metrics']:
-        if isinstance(metric, str):
-            try:
-                metric_list.append(getattr(desktop, metric))
-            except AttributeError:
-                print(f'`{metric}` is not a pre-defined Metric. Will skip')
-        if isinstance(metric, dict):
-            for data_source, data_source_metrics in metric.items():
-                for key, select_expr in data_source_metrics.items():
-                    if isinstance(select_expr, list):
-                        select_expr = ' '.join(select_expr)
-                    new_metric = Metric(name=key,
-                                        data_source=getattr(desktop,
-                                                            data_source),
-                                        select_expr=select_expr)
-                    metric_list.append(new_metric)
-
-    return metric_list
-
-
-def run_etl(exp_path, overwrite=False):
+def initialize_experiment(exp_path):
     exp_path = op.abspath(exp_path)
-    _build_directory(exp_path)
     report = validate_schema(op.join(exp_path, "report.json"))
-
-    FILENAME_ANALYSIS_DATA = op.join(exp_path, 'data',
-                                    f'{report["last_date_full_data"]}_'
-                                    f'{report["experiment_slug"]}.csv')
-
-
-    deciles = np.arange(1, 10) * 0.1
-    ci_quantiles = (0.005, 0.025, 0.5, 0.975, 0.995)
-    quantiles = np.unique(np.hstack((deciles, ci_quantiles)))
-    quantiles.sort()
-
-    bq_context = BigQueryContext(dataset_id=report["dataset_id"])
 
     exp = Experiment(
         experiment_slug=report["experiment_slug"],
         start_date=report["start_date"],
         num_dates_enrollment=report["num_dates_enrollment"]
     )
+
+    return exp, report
+
+
+def make_metric_list(report):
+    metric_list = list()
+    for metric in report['metrics']:
+        try:
+            metric_list.append(getattr(desktop, metric))
+        except AttributeError:
+            print(f'`{metric}` is not a pre-defined Metric. Will skip')
+    if 'user_defined_metrics' in report:
+        for data_source, data_source_metrics \
+            in report['user_defined_metrics'].items():
+            for key, select_expr in data_source_metrics.items():
+                new_metric = Metric(name=key,
+                                    data_source=getattr(desktop,
+                                                        data_source),
+                                    select_expr=select_expr)
+                metric_list.append(new_metric)
+
+    return metric_list
+
+
+def run_etl(exp_path, overwrite=False):
+    exp, report = initialize_experiment(exp_path)
+    _build_directory(exp_path)
+
+    FILENAME_ANALYSIS_DATA = op.join(exp_path, 'data',
+                                    f'{report["last_date_full_data"]}_'
+                                    f'{report["experiment_slug"]}.csv')
+    deciles = np.arange(1, 10) * 0.1
+    ci_quantiles = (0.005, 0.025, 0.5, 0.975, 0.995)
+    quantiles = np.unique(np.hstack((deciles, ci_quantiles)))
+    quantiles.sort()
+
+    bq_context = BigQueryContext(dataset_id=report["dataset_id"])
 
     metric_list = make_metric_list(report)
 

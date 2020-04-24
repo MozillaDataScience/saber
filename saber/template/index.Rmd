@@ -1,7 +1,6 @@
 ---
 title: '`r rjson::fromJSON(file="report.json")$title`'
 author: '`r rjson::fromJSON(file="report.json")$author` <<`r rjson::fromJSON(file="report.json")$email`>>'
-Status: '<*final*>'
 date: '`r rjson::fromJSON(file="report.json")$publish_date`'
 output:
   html_document:
@@ -48,7 +47,7 @@ __DS to complete__
 # {.tabset}
 
 ## Design
-<p align="center"><img src=design.png width=400px alt='experiment_mockup'></p>
+<p align="center"><img src=design.png width=600px alt='experiment_mockup'></p>
 
 
 ## Methods
