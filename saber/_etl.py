@@ -139,6 +139,8 @@ def _decilize(arr):
 
     arr_dict = {f"{int(label*100)}%": arr_quantile for label, arr_quantile
                 in zip(deciles, arr_quantiles)}
+    # include the mean of resample distribution
+    arr_dict['expected_mean'] = np.mean(arr)
 
     return arr_dict
 
@@ -173,7 +175,7 @@ def _res_to_df_nest(metric, res):
 
     def tidy_data(stats, branch, analysis):
         stats = stats.reset_index()
-        stats.rename(columns={'index': 'quantile'}, inplace=True)
+        stats.rename(columns={'index': 'statistic'}, inplace=True)
         stats['metric'] = metric
         stats['analysis'] = analysis
         stats['branch'] = branch

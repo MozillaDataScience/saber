@@ -31,6 +31,7 @@ def run():
     # create template files
     template = op.join('{}', '{}')
     rmd_file = template.format('{}', 'index.Rmd')
+    r_file = template.format('{}', 'helper_funcs.R')
     img_file = template.format('{}', 'design.png')
     html_file = template.format(exp_path, 'index.html')
     saber_dir = op.abspath(op.join(op.dirname(__file__), '..'))
@@ -46,6 +47,8 @@ def run():
     # copy over files
     shutil.copyfile(rmd_file.format(op.join(saber_dir, 'template')),
                     rmd_file.format(exp_path))
+    shutil.copyfile(r_file.format(op.join(saber_dir, 'template')),
+                    r_file.format(exp_path))
     if not op.exists(img_file.format(op.join(exp_path, 'template'))):
         shutil.copyfile(img_file.format(op.join(saber_dir, 'template')),
                         img_file.format(exp_path))
