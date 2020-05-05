@@ -4,3 +4,8 @@ _files*
 *.csv
 *report.Rmd
 *report.html
+*egg-info*
+*.pyc
+*.sql
+*.png
+*.ipynb_checkpoints*
