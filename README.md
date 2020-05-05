@@ -16,51 +16,37 @@ For your experiment:
 * Create a `report.json` spec like the one below:
 ```json
 {
-    "title": "Pref-Flip Experiment: Separate Search default in Private Browsing",
-    "publish_date": "2020-03-25",
-    "author": "Teon L Brooks",
-    "email": "teon@mozilla.com",
-    "experiment_slug": "pref-separate-search-default-in-private-browsing-release-71-73-bug-1603606",
-    "file": "index.html"
-}
-```
-
-
-* Create a `experiment.json` spec like the one below:
-
-```json
-{
-  "experimenter_name": "separate_search_default_pbm",
-  "start_date": "2019-12-17",
-  "last_date_full_data": "2020-02-18",
-  "num_dates_enrollment": 28,
-  "analysis_start_days": 0,
-  "analysis_length_days": 32,
-  "n_resamples": 1000,
-  "target_percent": 0.2,
-  "versions": "",
-  "dataset_id": "teon",
-  "metrics": [
-    "search_count",
-    "searches_with_ads",
-    "tagged_search_count",
-    "tagged_follow_on_search_count",
-    "ad_clicks",
-    "organic_search_count",
-    {
-      "search_clients_daily": {
-      "separate_search_engine": [
-              "ANY_VALUE(CASE WHEN default_search_engine =",
-              "default_private_search_engine",
-              "or default_private_search_engine is null THEN 0",
-              "ELSE 1 END)"
-      ],
-      "subsession_hours_sum": "ANY_VALUE(subsession_hours_sum)",
-      "active_hours_sum": "ANY_VALUE(active_hours_sum)"
+    "title": "Pref-Flip Experiment: Firefox Awesome Feature",
+    "publish_date": "1970-04-25",
+    "author": "Data Scientist",
+    "email": "ds@mozilla.com",
+    "experiment_slug": "pref-firefox-awesome-feature-release-75-77-bug-1603606",
+    "file": "index.html",
+    "experimenter_name": "separate_search_default_pbm",
+    "start_date": "1970-01-01",
+    "last_date_full_data": "1970-03-31",
+    "num_dates_enrollment": 14,
+    "analysis_start_days": 0,
+    "analysis_length_days": 28,
+    "n_resamples": 1000,
+    "target_percent": 0.2,
+    "versions": "75-77",
+    "dataset_id": "ds",
+    "metrics": [
+      "search_count",
+      "searches_with_ads",
+      "tagged_search_count",
+      "tagged_follow_on_search_count",
+      "ad_clicks",
+      "organic_search_count"
+    ],
+    "user_defined_metrics": {
+      "events": {
+        "awesomeness": "COUNT_IF(event_type = 'awesome')"
       }
     }
-  ]
-}
+  }
+```
 
 ```
 
