@@ -57,13 +57,9 @@ This experiment launched on `r report$start_date`, and targeted `r report$target
 
 We evaluated `r length(metrics)` measures of interactions in this study on a `per user` basis:
 
-```{r include=FALSE}
+```{r}
 knitr::kable(unique(df['metric']), col.names='Metrics')
 ```
-
-### Discussion
-
-__DS to complete__
 
 
 ```{r}

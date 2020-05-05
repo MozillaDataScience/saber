@@ -49,7 +49,7 @@ def run():
                     rmd_file.format(exp_path))
     shutil.copyfile(r_file.format(op.join(saber_dir, 'template')),
                     r_file.format(exp_path))
-    if not op.exists(img_file.format(op.join(exp_path, 'template'))):
+    if not op.exists(img_file.format(exp_path)):
         shutil.copyfile(img_file.format(op.join(saber_dir, 'template')),
                         img_file.format(exp_path))
 
