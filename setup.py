@@ -20,7 +20,7 @@ if version is None:
     raise RuntimeError('Could not determine version')
 
 
-descr = """SABER: Search A/B Experiment Report."""
+descr = """SABER: Swift A/B Experiment Report."""
 
 DISTNAME = 'saber'
 DESCRIPTION = descr
@@ -52,7 +52,8 @@ if __name__ == "__main__":
           install_requires=[
               'mozanalysis',
               'jsonschema',
-              'pandas'
+              'pandas',
+              'jupyter-book'
           ],
           entry_points={'console_scripts': [
               'saber = utils.command_line:run',
