@@ -1,15 +1,14 @@
 # SABER
 
-This is an MVP of the SABER framework.
+This is an MVP of the Swift A/B Experiment Report (SABER) framework.
 
 To setup:
 
-* Run `python setup.py develop`
-	* This will check and/or install `mozanalysis` and its dependencies
 * Install [Google Cloud SDK](https://cloud.google.com/sdk/install)
 	* This will allow you to authenticate your session with your LDAP credentials
-* Install R/[RMarkdown](https://bookdown.org/yihui/rmarkdown/installation.html).
-* Create a new experiment folder under the `experiments` directory, i.e `experiments/my_new_experiment`
+* Run `python setup.py develop`
+	* This will check and/or install `mozanalysis`, `jupyter-book` and its dependencies
+* Create a new experiment folder under your `experiments` directory, i.e `experiments/my_new_experiment`
 
 For your experiment:
 
@@ -50,7 +49,7 @@ For your experiment:
 
 ```
 
-* Fill in the relevant fields for your study.`dir` is the name of the directory you just created (in this case, "my_new_experiment")
+* Fill in the relevant fields for your study. `dir` is the name of the directory you just created (in this case, "my_new_experiment")
 * From the top level directory, run the following command
 
 ```bash
