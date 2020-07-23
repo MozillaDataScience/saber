@@ -1,13 +1,15 @@
 import os
 import os.path as op
 import shutil
+from distutils.dir_util import copy_tree
 import subprocess
 from argparse import ArgumentParser
 import webbrowser
+import json
 
 import _etl
 
-description = 'SABER: Search A/B Experiment Report'
+description = 'SABER: Swift A/B Experiment Report'
 
 
 def run():
@@ -29,34 +31,39 @@ def run():
         raise IndexError('Missing folder argument.')
 
     # create template files
-    template = op.join('{}', '{}')
-    rmd_file = template.format('{}', 'index.Rmd')
-    r_file = template.format('{}', 'helper_funcs.R')
-    img_file = template.format('{}', 'design.png')
-    html_file = template.format(exp_path, 'index.html')
     saber_dir = op.abspath(op.join(op.dirname(__file__), '..'))
+    src_folder = op.join(saber_dir, 'template', 'src')
+    exp_src_folder = op.join(exp_path, 'src')
+    img_file = op.join(exp_path, 'design.png')
+
+    html_file = op.join(exp_path, 'src', '_build', 'html', 'index.html')
+    report_file = op.join(exp_path, 'report.json')
 
     # check to make sure you're not overwriting
-    if op.exists(rmd_file.format(exp_path)) and not overwrite:
-        raise OSError("File already exists!")
+    if op.exists(op.join(exp_path, 'src')) and not overwrite:
+        raise OSError("Folder already exists!")
 
     # run the ETL
     print("Proceeding to etl...")
     _etl.run_etl(exp_path, overwrite)
 
     # copy over files
-    shutil.copyfile(rmd_file.format(op.join(saber_dir, 'template')),
-                    rmd_file.format(exp_path))
-    shutil.copyfile(r_file.format(op.join(saber_dir, 'template')),
-                    r_file.format(exp_path))
-    if not op.exists(img_file.format(exp_path)):
-        shutil.copyfile(img_file.format(op.join(saber_dir, 'template')),
-                        img_file.format(exp_path))
+    copy_tree(src_folder, exp_src_folder)
+    if op.exists(img_file):
+        shutil.move(img_file,
+                    op.join(exp_src_folder, 'images', op.basename(img_file)))
 
-    # knit the preliminary report
-    subprocess.run(["R", "-e",
-                    (f"rmarkdown::render('{rmd_file.format(exp_path)}',"
-                     f"output_file='{html_file}')")
-                    ])
+    # create yaml files
+    report = json.load(open(report_file))
+    with open(op.join(exp_path, 'src', '_config.yml'), 'w') as FILE:
+        FILE.write(f"""\
+title: '{report['title']}'
+author: '{report['author']}'
+date: '{report['publish_date']}'
+logo: images/logo.png
+""")
+
+    # build the preliminary report
+    subprocess.run(["jupyter-book", "build", exp_src_folder])
     if openbrowser:
         webbrowser.open_new_tab(('file://' + op.abspath(html_file)))
