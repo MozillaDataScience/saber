@@ -1,6 +1,7 @@
 import os
 import os.path as op
 import shutil
+from distutils.dir_util import copy_tree
 import subprocess
 from argparse import ArgumentParser
 import webbrowser
@@ -35,7 +36,7 @@ def run():
     exp_src_folder = op.join(exp_path, 'src')
     img_file = op.join(exp_path, 'design.png')
 
-    html_file = op.join(exp_path, '_build', 'html', 'index.html')
+    html_file = op.join(exp_path, 'src', '_build', 'html', 'index.html')
     report_file = op.join(exp_path, 'report.json')
 
     # check to make sure you're not overwriting
@@ -44,10 +45,10 @@ def run():
 
     # run the ETL
     print("Proceeding to etl...")
-    # _etl.run_etl(exp_path, overwrite)
+    _etl.run_etl(exp_path, overwrite)
 
     # copy over files
-    shutil.copytree(src_folder, exp_src_folder)
+    copy_tree(src_folder, exp_src_folder)
     if op.exists(img_file):
         shutil.move(img_file,
                     op.join(exp_src_folder, 'images', op.basename(img_file)))
