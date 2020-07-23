@@ -12,6 +12,8 @@ kernelspec:
   language: python
   name: python3
 ---
+# Executive Summary
+
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
@@ -27,11 +29,12 @@ report = json.load(open(op.join("..", "report.json")))
 for key in report:
     glue(f"report['{key}']", report[key])
 ```
-# Executive Summary
+
 {glue:text}`report['author']` <{glue:text}`report['email']`>
+
+Date: {glue:text}`report['publish_date']`
+
 Status: <*automated draft*>
-
-
 
 ## Motivation
 This is an experiment report for the {glue:text}`report['experiment_slug']` study.
@@ -41,7 +44,6 @@ __DS to complete__
 ## Takeaways
 
 __DS to complete__
-
 
 ## Design
 

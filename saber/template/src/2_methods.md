@@ -42,16 +42,15 @@ glue('metrics', metrics)
 ## Supporting Assets
 
 ```{code-cell} ipython3
-# glue('experimenter_url', op.join('https://experimenter.services.mozilla.com',
-#                                'experiments',
-#                                report['experimenter_name']))
-op.join('https://experimenter.services.mozilla.com',
-        'experiments',
-        report['experimenter_name'])
+:tags: [remove-cell]
+
+glue('experimenter_url', op.join('https://experimenter.services.mozilla.com',
+                                 'experiments',
+                                 report['experimenter_name']))
 ```
 
-<!-- - [Experimenter]({glue:text}`experimenter_url`)
-<a href ={glue:text}`experimenter_url`>Experimenter</a> -->
+- Experimenter: {glue:text}`experimenter_url`
+
 
 ## Terminology
 
