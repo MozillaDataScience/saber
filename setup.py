@@ -53,7 +53,9 @@ if __name__ == "__main__":
               'mozanalysis',
               'jsonschema',
               'pandas',
-              'jupyter-book'
+              'jupyter-book',
+              'jupytext',
+              'plotly'
           ],
           entry_points={'console_scripts': [
               'saber = utils.command_line:run',

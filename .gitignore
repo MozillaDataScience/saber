@@ -7,5 +7,4 @@ _files*
 *egg-info*
 *.pyc
 *.sql
-*.png
 *.ipynb_checkpoints*
