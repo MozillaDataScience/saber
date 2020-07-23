@@ -58,7 +58,7 @@ def run():
     with open(op.join(exp_path, 'src', '_config.yml'), 'w') as FILE:
         FILE.write(f"""\
 title: '{report['title']}'
-author: '{report['author']} <<{report['email']}>>'
+author: '{report['author']}'
 date: '{report['publish_date']}'
 logo: images/logo.png
 """)

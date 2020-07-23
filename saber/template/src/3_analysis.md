@@ -14,7 +14,6 @@ kernelspec:
 ---
 # Results
 
-
 ```{code-cell} ipython3
 :tags: [remove-cell]
 

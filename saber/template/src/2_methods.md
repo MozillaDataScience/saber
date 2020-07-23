@@ -59,7 +59,7 @@ For this study, we used the following terms for our analysis:
 
 __DS to complete__
 
-### Data Assets
+## Data Assets
 This experiment launched on {glue:text}`report['start_date']`, and targeted {glue:text}`report['target_percent']` of Firefox Users on version {glue:text}`report['versions']`. These users were randomly sampled and assigned one of the {glue:text}`n_branches` experimental conditions: {glue:text}`branches`.
 
 We evaluated {glue:text}`n_metrics` measures of interactions in this study on a `per user` basis:
