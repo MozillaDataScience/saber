@@ -1,15 +1,35 @@
+---
+jupytext:
+  cell_metadata_filter: -all
+  formats: md:myst
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: '0.9'
+    jupytext_version: 1.5.2
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
 # Executive Summary
 Status: <*automated draft*>
 
-```python
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+from myst_nb import glue
 import numpy as np
 import pandas as pd
 import json
 import os.path as op
-```
 
-```python
+
 report = json.load(open(op.join("..", "report.json")))
+# hack to add all the report keys to the glue scope
+for key in report:
+    glue(f"report['{key}']", report[key])
 ```
 
 # Motivation
@@ -22,7 +42,10 @@ __DS to complete__
 __DS to complete__
 
 
-# {.tabset}
-
 ## Design
-<p align="center"><img src=../../../design.png width=600px alt='experiment_mockup'></p>
+
+```{image} images/design.png
+:alt: 'experiment mockup'
+:width: 600px
+:align: center
+```
