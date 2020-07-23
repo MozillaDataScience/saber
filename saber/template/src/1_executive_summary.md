@@ -37,7 +37,7 @@ This is an experiment report for the {glue:text}`report['experiment_slug']` stud
 
 __DS to complete__
 
-# Executive Summary
+# Takeaways
 
 __DS to complete__
 
