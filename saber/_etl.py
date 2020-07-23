@@ -53,19 +53,30 @@ def bootstrap_data(exp_path, single_window_res, num_samples,
 
     res_metrics = list()
     for metric in metric_names:
-        res_metric = _res_to_df_nest(
-            metric,
-            mafsb.compare_branches(
-                single_window_res,
-                col_label=metric,
-                ref_branch_label=ref_branch_label,
-                stat_fn=_decilize,
-                threshold_quantile=threshold_quantile,
-                individual_summary_quantiles=list(ci_quantiles),
-                comparative_summary_quantiles=list(ci_quantiles),
-                num_samples=num_samples
+        if any(single_window_res['branch'] == ref_branch_label):
+            res_metric = _res_to_df_nest(
+                metric,
+                mafsb.compare_branches(
+                    single_window_res,
+                    col_label=metric,
+                    ref_branch_label=ref_branch_label,
+                    stat_fn=_decilize,
+                    threshold_quantile=threshold_quantile,
+                    individual_summary_quantiles=list(ci_quantiles),
+                    comparative_summary_quantiles=list(ci_quantiles),
+                    num_samples=num_samples
+                )
             )
-        )
+        elif len(np.unique(single_window_res['branch'])) == 1:
+            res_metric = mafsb.bootstrap_one_branch(single_window_res[metric],
+                                                    stat_fn=_decilize,
+                                                    num_samples=num_samples,
+                                                    summary_quantiles=list(ci_quantiles)
+                                                    )
+        else:
+            raise ValueError("There are multiple branches present in this ",
+                             "study, but `ref_branch_label` is either "
+                             "missing or incorrect.")
         res_metrics.append(res_metric)
     res_metrics = pd.concat(res_metrics)
 
