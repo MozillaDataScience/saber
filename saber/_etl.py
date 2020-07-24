@@ -50,10 +50,20 @@ def bootstrap_data(exp_path, single_window_res, num_samples,
     report = validate_schema(op.join(op.abspath(exp_path), "report.json"))
     metric_list = _make_metric_list(report)
     metric_names = [metric.name for metric in metric_list]
+    branches = np.unique(single_window_res['branch']).tolist()
 
     res_metrics = list()
-    for metric in metric_names:
-        if any(single_window_res['branch'] == ref_branch_label):
+
+    if len(branches) == 1:
+        for metric in metric_names:
+            res_metric = mafsb.bootstrap_one_branch(single_window_res[metric],
+                                                    stat_fn=_decilize,
+                                                    num_samples=num_samples,
+                                                    summary_quantiles=list(ci_quantiles)
+                                                    )
+            res_metrics.append(res_metric)
+    elif ref_branch_label in branches:
+        for metric in metric_names:
             res_metric = _res_to_df_nest(
                 metric,
                 mafsb.compare_branches(
@@ -67,17 +77,11 @@ def bootstrap_data(exp_path, single_window_res, num_samples,
                     num_samples=num_samples
                 )
             )
-        elif len(np.unique(single_window_res['branch'])) == 1:
-            res_metric = mafsb.bootstrap_one_branch(single_window_res[metric],
-                                                    stat_fn=_decilize,
-                                                    num_samples=num_samples,
-                                                    summary_quantiles=list(ci_quantiles)
-                                                    )
-        else:
-            raise ValueError("There are multiple branches present in this ",
-                             "study, but `ref_branch_label` is either "
-                             "missing or incorrect.")
-        res_metrics.append(res_metric)
+            res_metrics.append(res_metric)
+    else:
+        raise ValueError("There are multiple branches present in this ",
+                         "study, but `ref_branch_label` is either "
+                         "missing or incorrect.")
     res_metrics = pd.concat(res_metrics)
 
     return res_metrics
