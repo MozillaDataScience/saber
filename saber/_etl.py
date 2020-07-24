@@ -10,7 +10,7 @@ import mozanalysis.frequentist_stats.bootstrap as mafsb
 import mozanalysis.metrics.desktop as desktop
 from mozanalysis.bq import BigQueryContext
 from mozanalysis.experiment import Experiment, TimeLimits
-from mozanalysis.metrics import Metric
+from mozanalysis.metrics import Metric, DataSource
 
 from utils.validate_schema import validate_schema
 
@@ -165,10 +165,15 @@ def _make_metric_list(report):
     if 'user_defined_metrics' in report:
         for data_source, data_source_metrics \
                 in report['user_defined_metrics'].items():
+            if not getattr(desktop, data_source, None):
+                from_expr = report['user_defined_data_source'][data_source]
+                data_source = DataSource(name=data_source, from_expr=from_expr,
+                                         experiments_column_type='native')
+            else:
+                data_source = getattr(desktop, data_source)
             for key, select_expr in data_source_metrics.items():
                 new_metric = Metric(name=key,
-                                    data_source=getattr(desktop,
-                                                        data_source),
+                                    data_source=data_source,
                                     select_expr=select_expr)
                 metric_list.append(new_metric)
 

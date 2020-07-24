@@ -47,7 +47,6 @@ For your experiment:
   }
 ```
 
-```
 
 * Fill in the relevant fields for your study. `dir` is the name of the directory you just created (in this case, "my_new_experiment")
 * From the top level directory, run the following command
