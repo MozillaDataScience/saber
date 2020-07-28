@@ -22,11 +22,14 @@ def run():
                         help='Force an overwrite')
     parser.add_argument('-o', dest='openbrowser', action='store_true',
                         help='Open report in web browser')
+    parser.add_argument('-c', dest='custom', default=None,
+                        help='Loads custom etl script')
 
     args = parser.parse_args()
     exp_path = op.abspath(args.folder_path)
     overwrite = args.overwrite
     openbrowser = args.openbrowser
+    custom = args.custom
     if not args.folder_path:
         raise IndexError('Missing folder argument.')
 
@@ -45,7 +48,10 @@ def run():
 
     # run the ETL
     print("Proceeding to etl...")
-    _etl.run_etl(exp_path, overwrite)
+    if custom:
+        pass
+    else:
+        _etl.run_etl(exp_path, overwrite)
 
     # copy over files
     copy_tree(src_folder, exp_src_folder)

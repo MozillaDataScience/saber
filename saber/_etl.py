@@ -109,6 +109,12 @@ def dry_run_query(exp_path):
     return query
 
 
+def run_custom_query(query, res_dataset_id, res_table_name):
+    bq_context = BigQueryContext(dataset_id=res_dataset_id)
+
+    return bq_context.run_query(sql, res_table_name).to_dataframe()
+
+
 def run_etl(exp_path, overwrite=False):
     # Initialization
     exp_path = op.abspath(exp_path)
