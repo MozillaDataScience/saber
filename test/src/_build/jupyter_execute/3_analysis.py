@@ -74,6 +74,7 @@ import plotly.graph_objects as go
 for ii, group in summary_groupby:
     group_mean = group[group['statistic'] == 'expected_mean']
     group_mean['Percentage Change'] = group_mean['Percentage Change']  \
+                                        .multiply(100)  \
                                         .map('{:.2f}%'.format)
     group_mean = group_mean[['Metric of Interest',
                               'Percentage Change',

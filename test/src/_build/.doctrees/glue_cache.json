@@ -1,65 +1,5 @@
 {
   "1_executive_summary": {
-    "report['file']": {
-      "output_type": "display_data",
-      "metadata": {
-        "scrapbook": {
-          "name": "report['file']",
-          "mime_prefix": ""
-        }
-      },
-      "data": {
-        "text/plain": "'index.html'"
-      }
-    },
-    "report['last_date_full_data']": {
-      "output_type": "display_data",
-      "metadata": {
-        "scrapbook": {
-          "name": "report['last_date_full_data']",
-          "mime_prefix": ""
-        }
-      },
-      "data": {
-        "text/plain": "'2020-02-18'"
-      }
-    },
-    "report['target_percent']": {
-      "output_type": "display_data",
-      "metadata": {
-        "scrapbook": {
-          "name": "report['target_percent']",
-          "mime_prefix": ""
-        }
-      },
-      "data": {
-        "text/plain": "0.2"
-      }
-    },
-    "report['metrics']": {
-      "output_type": "display_data",
-      "metadata": {
-        "scrapbook": {
-          "name": "report['metrics']",
-          "mime_prefix": ""
-        }
-      },
-      "data": {
-        "text/plain": "['search_count',\n 'searches_with_ads',\n 'tagged_search_count',\n 'tagged_follow_on_search_count',\n 'ad_clicks',\n 'organic_search_count']"
-      }
-    },
-    "report['start_date']": {
-      "output_type": "display_data",
-      "metadata": {
-        "scrapbook": {
-          "name": "report['start_date']",
-          "mime_prefix": ""
-        }
-      },
-      "data": {
-        "text/plain": "'2019-12-17'"
-      }
-    },
     "report['experimenter_name']": {
       "output_type": "display_data",
       "metadata": {
@@ -72,40 +12,16 @@
         "text/plain": "'separate_search_default_pbm'"
       }
     },
-    "report['publish_date']": {
+    "report['versions']": {
       "output_type": "display_data",
       "metadata": {
         "scrapbook": {
-          "name": "report['publish_date']",
+          "name": "report['versions']",
           "mime_prefix": ""
         }
       },
       "data": {
-        "text/plain": "'2020-03-25'"
-      }
-    },
-    "report['num_dates_enrollment']": {
-      "output_type": "display_data",
-      "metadata": {
-        "scrapbook": {
-          "name": "report['num_dates_enrollment']",
-          "mime_prefix": ""
-        }
-      },
-      "data": {
-        "text/plain": "28"
-      }
-    },
-    "report['user_defined_metrics']": {
-      "output_type": "display_data",
-      "metadata": {
-        "scrapbook": {
-          "name": "report['user_defined_metrics']",
-          "mime_prefix": ""
-        }
-      },
-      "data": {
-        "text/plain": "{'search_clients_daily': {'separate_search_engine': 'ANY_VALUE(CASE WHEN default_search_engine = default_private_search_engine or default_private_search_engine is null THEN 0 ELSE 1 END)',\n  'subsession_hours_sum': 'ANY_VALUE(subsession_hours_sum)',\n  'active_hours_sum': 'ANY_VALUE(active_hours_sum)'}}"
+        "text/plain": "''"
       }
     },
     "report['n_resamples']": {
@@ -120,28 +36,16 @@
         "text/plain": "1000"
       }
     },
-    "report['analysis_start_days']": {
+    "report['start_date']": {
       "output_type": "display_data",
       "metadata": {
         "scrapbook": {
-          "name": "report['analysis_start_days']",
+          "name": "report['start_date']",
           "mime_prefix": ""
         }
       },
       "data": {
-        "text/plain": "0"
-      }
-    },
-    "report['experiment_slug']": {
-      "output_type": "display_data",
-      "metadata": {
-        "scrapbook": {
-          "name": "report['experiment_slug']",
-          "mime_prefix": ""
-        }
-      },
-      "data": {
-        "text/plain": "'pref-separate-search-default-in-private-browsing-release-71-73-bug-1603606'"
+        "text/plain": "'2019-12-17'"
       }
     },
     "report['email']": {
@@ -156,6 +60,42 @@
         "text/plain": "'teon@mozilla.com'"
       }
     },
+    "report['metrics']": {
+      "output_type": "display_data",
+      "metadata": {
+        "scrapbook": {
+          "name": "report['metrics']",
+          "mime_prefix": ""
+        }
+      },
+      "data": {
+        "text/plain": "['search_count',\n 'searches_with_ads',\n 'tagged_search_count',\n 'tagged_follow_on_search_count',\n 'ad_clicks',\n 'organic_search_count']"
+      }
+    },
+    "report['last_date_full_data']": {
+      "output_type": "display_data",
+      "metadata": {
+        "scrapbook": {
+          "name": "report['last_date_full_data']",
+          "mime_prefix": ""
+        }
+      },
+      "data": {
+        "text/plain": "'2020-02-18'"
+      }
+    },
+    "report['analysis_start_days']": {
+      "output_type": "display_data",
+      "metadata": {
+        "scrapbook": {
+          "name": "report['analysis_start_days']",
+          "mime_prefix": ""
+        }
+      },
+      "data": {
+        "text/plain": "0"
+      }
+    },
     "report['author']": {
       "output_type": "display_data",
       "metadata": {
@@ -168,16 +108,52 @@
         "text/plain": "'Teon L Brooks'"
       }
     },
-    "report['versions']": {
+    "report['user_defined_metrics']": {
       "output_type": "display_data",
       "metadata": {
         "scrapbook": {
-          "name": "report['versions']",
+          "name": "report['user_defined_metrics']",
           "mime_prefix": ""
         }
       },
       "data": {
-        "text/plain": "''"
+        "text/plain": "{'search_clients_daily': {'separate_search_engine': 'ANY_VALUE(CASE WHEN default_search_engine = default_private_search_engine or default_private_search_engine is null THEN 0 ELSE 1 END)',\n  'subsession_hours_sum': 'ANY_VALUE(subsession_hours_sum)',\n  'active_hours_sum': 'ANY_VALUE(active_hours_sum)'}}"
+      }
+    },
+    "report['dataset_id']": {
+      "output_type": "display_data",
+      "metadata": {
+        "scrapbook": {
+          "name": "report['dataset_id']",
+          "mime_prefix": ""
+        }
+      },
+      "data": {
+        "text/plain": "'teon'"
+      }
+    },
+    "report['experiment_slug']": {
+      "output_type": "display_data",
+      "metadata": {
+        "scrapbook": {
+          "name": "report['experiment_slug']",
+          "mime_prefix": ""
+        }
+      },
+      "data": {
+        "text/plain": "'pref-separate-search-default-in-private-browsing-release-71-73-bug-1603606'"
+      }
+    },
+    "report['target_percent']": {
+      "output_type": "display_data",
+      "metadata": {
+        "scrapbook": {
+          "name": "report['target_percent']",
+          "mime_prefix": ""
+        }
+      },
+      "data": {
+        "text/plain": "0.2"
       }
     },
     "report['title']": {
@@ -204,20 +180,56 @@
         "text/plain": "32"
       }
     },
-    "report['dataset_id']": {
+    "report['publish_date']": {
       "output_type": "display_data",
       "metadata": {
         "scrapbook": {
-          "name": "report['dataset_id']",
+          "name": "report['publish_date']",
           "mime_prefix": ""
         }
       },
       "data": {
-        "text/plain": "'teon'"
+        "text/plain": "'2020-03-25'"
+      }
+    },
+    "report['file']": {
+      "output_type": "display_data",
+      "metadata": {
+        "scrapbook": {
+          "name": "report['file']",
+          "mime_prefix": ""
+        }
+      },
+      "data": {
+        "text/plain": "'index.html'"
+      }
+    },
+    "report['num_dates_enrollment']": {
+      "output_type": "display_data",
+      "metadata": {
+        "scrapbook": {
+          "name": "report['num_dates_enrollment']",
+          "mime_prefix": ""
+        }
+      },
+      "data": {
+        "text/plain": "28"
       }
     }
   },
   "2_methods": {
+    "n_metrics": {
+      "output_type": "display_data",
+      "metadata": {
+        "scrapbook": {
+          "name": "n_metrics",
+          "mime_prefix": ""
+        }
+      },
+      "data": {
+        "text/plain": "9"
+      }
+    },
     "n_branches": {
       "output_type": "display_data",
       "metadata": {
@@ -264,18 +276,6 @@
       },
       "data": {
         "text/plain": "['control', 'treatment-banner', 'treatment-no-banner']"
-      }
-    },
-    "n_metrics": {
-      "output_type": "display_data",
-      "metadata": {
-        "scrapbook": {
-          "name": "n_metrics",
-          "mime_prefix": ""
-        }
-      },
-      "data": {
-        "text/plain": "9"
       }
     }
   }
