@@ -1,6 +1,5 @@
 data*
 _files*
-*.html
 *.csv
 *report.Rmd
 *report.html
