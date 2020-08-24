@@ -54,10 +54,10 @@ def run():
         _etl.run_etl(exp_path, overwrite)
 
     # copy over files
-    copy_tree(src_folder, exp_src_folder)
     if op.exists(img_file):
         shutil.move(img_file,
                     op.join(exp_src_folder, 'images', op.basename(img_file)))
+    copy_tree(src_folder, exp_src_folder, update=1)
 
     # create yaml files
     report = json.load(open(report_file))

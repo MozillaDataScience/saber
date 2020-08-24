@@ -64,6 +64,8 @@ def bootstrap_data(exp_path, single_window_res, num_samples,
             res_metrics.append(res_metric)
     elif ref_branch_label in branches:
         for metric in metric_names:
+            # TODO: figure out why columns aren't being typecast with numpy
+            single_window_res[metric] = single_window_res[metric].astype('float')
             res_metric = _res_to_df_nest(
                 metric,
                 mafsb.compare_branches(
